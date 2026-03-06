@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial Completo - LED Controller | ISW044 Aula 01</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 40px; border-radius: 15px; margin-bottom: 30px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .progresso { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .progresso h3 { color: #4facfe; margin-bottom: 15px; }
+        .progresso-bar { width: 100%; height: 30px; background: #e0e0e0; border-radius: 15px; overflow: hidden; }
+        .progresso-fill { height: 100%; background: linear-gradient(90deg, #4facfe, #00f2fe); width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .passo { background: white; padding: 30px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .passo-numero { display: inline-block; background: #4facfe; color: white; width: 50px; height: 50px; border-radius: 50%; text-align: center; line-height: 50px; font-size: 1.5em; font-weight: bold; margin-right: 15px; float: left; }
+        .passo h2 { color: #333; margin-bottom: 20px; padding-left: 65px; }
+        .passo-conteudo { clear: both; padding-top: 10px; }
+        .codigo { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 10px; overflow-x: auto; margin: 15px 0; position: relative; font-family: 'Courier New', monospace; font-size: 14px; }
+        .codigo-titulo { background: #21252b; color: #abb2bf; padding: 10px 15px; border-radius: 10px 10px 0 0; font-weight: bold; margin-bottom: -20px; position: relative; top: 20px; }
+        .btn-copiar { position: absolute; top: 10px; right: 10px; background: #4facfe; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        .btn-copiar:hover { background: #00f2fe; }
+        .alerta { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .dica { background: #d4edda; border-left: 5px solid #28a745; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .erro { background: #f8d7da; border-left: 5px solid #dc3545; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .sucesso { background: #d4edda; border-left: 5px solid #28a745; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { padding: 10px; margin: 5px 0; background: #f8f9fa; border-radius: 5px; cursor: pointer; transition: all 0.3s; }
+        .checklist li:hover { background: #e9ecef; }
+        .checklist li:before { content: "☐ "; font-size: 1.5em; margin-right: 10px; }
+        .checklist li.completo:before { content: "✅ "; }
+        .checklist li.completo { background: #d4edda; text-decoration: line-through; opacity: 0.7; }
+        .screenshot { border: 3px solid #4facfe; border-radius: 10px; padding: 10px; background: white; text-align: center; margin: 20px 0; }
+        .screenshot-texto { font-family: monospace; white-space: pre; text-align: left; background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .btn-proximo { background: #4facfe; color: white; padding: 15px 30px; border: none; border-radius: 10px; font-size: 1.1em; cursor: pointer; display: block; width: 100%; margin-top: 20px; }
+        .btn-proximo:hover { background: #00f2fe; }
+        .oculto { display: none; }
+        .final-card { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 40px; border-radius: 20px; text-align: center; margin: 20px 0; }
+        .final-card h2 { font-size: 2em; margin-bottom: 15px; }
+        .linha-codigo { color: #e5c07b; }
+        .linha-comentario { color: #5c6370; font-style: italic; }
+        .linha-keyword { color: #c678dd; }
+        .linha-funcao { color: #61afef; }
+        .linha-numero { color: #d19a66; }
+        .nav-passos { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .nav-btn { background: #e0e0e0; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .nav-btn.ativo { background: #4facfe; color: white; }
+        .nav-btn.feito { background: #28a745; color: white; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🎓 Tutorial Passo-a-Passo</h1>
+        <h2>Aula 01: LED Controller</h2>
+        <p>Siga cada etapa cuidadosamente. Você consegue! 💪</p>
+    </div>
+
+    <div class="progresso">
+        <h3>📊 Seu Progresso</h3>
+        <div class="progresso-bar">
+            <div class="progresso-fill" id="progresso">0%</div>
+        </div>
+        <p style="margin-top: 10px; text-align: center;" id="progresso-texto">Você completou 0 de 15 etapas</p>
+        <div class="nav-passos" id="nav-passos" style="margin-top:15px;">
+            <!-- gerado pelo JS -->
+        </div>
+    </div>
+
+    <!-- PASSO 1 -->
+    <div class="passo" id="passo1">
+        <div class="passo-numero">1</div>
+        <h2>Reunir Materiais</h2>
+        <div class="passo-conteudo">
+            <p>Antes de começar, certifique-se de ter TODOS os materiais:</p>
+            <h3 style="margin-top: 20px;">📦 Lista de Materiais:</h3>
+            <ul class="checklist">
+                <li onclick="marcarCompleto(this)">Arduino Uno R3</li>
+                <li onclick="marcarCompleto(this)">Cabo USB A-B</li>
+                <li onclick="marcarCompleto(this)">LED (qualquer cor)</li>
+                <li onclick="marcarCompleto(this)">Resistor 220Ω (vermelho-vermelho-marrom)</li>
+                <li onclick="marcarCompleto(this)">2 Jumpers macho-macho</li>
+                <li onclick="marcarCompleto(this)">Protoboard (400 ou 830 pontos)</li>
+            </ul>
+            <div class="dica">
+                <strong>💡 Dica:</strong> Não tem Arduino? Pode usar simulador online!<br>
+                Acesse: <a href="https://www.tinkercad.com/circuits" target="_blank">Tinkercad Circuits</a>
+            </div>
+            <div class="alerta">
+                <strong>⚠️ Atenção:</strong> Verifique se o LED não está queimado testando com uma bateria 3V!
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(2)">✅ Tenho Todos Materiais → Próximo Passo</button>
+        </div>
+    </div>
+
+    <!-- PASSO 2 -->
+    <div class="passo oculto" id="passo2">
+        <div class="passo-numero">2</div>
+        <h2>Identificar Componentes</h2>
+        <div class="passo-conteudo">
+            <h3>🔍 Vamos Conhecer Cada Peça:</h3>
+            <h4 style="margin-top: 20px;">Arduino Uno</h4>
+            <div class="screenshot">
+                <div class="screenshot-texto">Arduino Uno R3
+┌─────────────────────────────┐
+│  USB                        │
+│  ┌───┐                      │
+│  │   │  ┌────┐              │
+│  └───┘  │CHIP│              │
+│         └────┘              │
+│  ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○  │ ← Pinos Digitais (0-13)
+│  ○ ○ ○ ○ ○ ○              │ ← Pinos Analógicos (A0-A5)
+│  ○ ○ ○                    │ ← GND, 5V, 3.3V
+└─────────────────────────────┘</div>
+                <p><strong>Vamos usar:</strong> Pino 13 e GND</p>
+            </div>
+            <h4>LED (Light Emitting Diode)</h4>
+            <div class="screenshot">
+                <div class="screenshot-texto">      ┌─┐
+      │ │ ← Cabeça transparente
+      └─┘
+       │
+     Perna LONGA (+) ← ANODO (positivo) 
+       │
+     Perna CURTA (-) ← CATODO (negativo)</div>
+            </div>
+            <div class="alerta">
+                <strong>⚠️ SUPER IMPORTANTE:</strong><br>
+                LED TEM POLARIDADE! Não funciona se ligar ao contrário!<br>
+                • Perna LONGA = Positivo (+)<br>
+                • Perna CURTA = Negativo (-)
+            </div>
+            <h4>Resistor 220Ω</h4>
+            <div class="screenshot">
+                <div class="screenshot-texto">  ┌─────┐
+──┤█████├──
+  └─────┘
+  
+Código de cores:
+🔴 Vermelho - 🔴 Vermelho - 🟤 Marrom = 220Ω</div>
+            </div>
+            <div class="dica">
+                <strong>💡 Por que usar resistor?</strong><br>
+                Arduino fornece 5V, LED aguenta 2-3V.<br>
+                Resistor "come" o excesso, protegendo o LED!
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(3)">✅ Entendi os Componentes → Próximo</button>
+        </div>
+    </div>
+
+    <!-- PASSO 3 -->
+    <div class="passo oculto" id="passo3">
+        <div class="passo-numero">3</div>
+        <h2>Montar o Circuito - Parte 1: LED</h2>
+        <div class="passo-conteudo">
+            <h3>🔧 Montagem PASSO A PASSO:</h3>
+            <h4>3.1 - Colocar LED na Protoboard</h4>
+            <div class="screenshot">
+                <p><strong>Protoboard (visão de cima):</strong></p>
+                <div class="screenshot-texto">     a b c d e   f g h i j
+  ...
+  10 ○ ○ ○ ○ ●   ○ ○ ○ ○ ○  ← LED perna LONGA aqui
+  11 ○ ○ ○ ○ ●   ○ ○ ○ ○ ○  ← LED perna CURTA aqui
+  ...</div>
+            </div>
+            <ol style="margin-left: 20px; margin-top: 15px;">
+                <li>Pegar LED</li>
+                <li>Identificar perna LONGA (olhe com atenção!)</li>
+                <li>Inserir perna LONGA na linha 10, coluna E</li>
+                <li>Inserir perna CURTA na linha 11, coluna E</li>
+                <li>Pressionar gentilmente até firmar</li>
+            </ol>
+            <div class="alerta"><strong>⚠️ Cuidado:</strong> Não force! Pernas do LED são frágeis e podem dobrar.</div>
+            <div class="dica"><strong>💡 Dica Visual:</strong> Perna longa geralmente fica do lado ACHATADO do LED.</div>
+            <h3 style="margin-top: 30px;">📸 Checkpoint: Como deve estar agora</h3>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">LED firmemente inserido na protoboard</li>
+                <li onclick="marcarCompleto(this)">Perna longa na linha 10</li>
+                <li onclick="marcarCompleto(this)">Perna curta na linha 11</li>
+                <li onclick="marcarCompleto(this)">LED na vertical (não torto)</li>
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(4)">✅ LED Colocado Corretamente → Próximo</button>
+        </div>
+    </div>
+
+    <!-- PASSO 4 -->
+    <div class="passo oculto" id="passo4">
+        <div class="passo-numero">4</div>
+        <h2>Montar o Circuito - Parte 2: Resistor</h2>
+        <div class="passo-conteudo">
+            <h3>🔧 Adicionar Resistor:</h3>
+            <h4>4.1 - Preparar Resistor</h4>
+            <ol style="margin-left: 20px;">
+                <li>Pegar resistor 220Ω (vermelho-vermelho-marrom)</li>
+                <li>Dobrar as pernas em formato "L"</li>
+                <li>Deixar cerca de 1cm de cada lado</li>
+            </ol>
+            <h4>4.2 - Colocar Resistor</h4>
+            <div class="screenshot">
+                <div class="screenshot-texto">+ + ●...           ← Uma perna do resistor aqui (linha +)
+...
+  10 ● ○ ○ ○ ●    ← LED perna longa + outra perna resistor
+  11 ○ ○ ○ ○ ●    ← LED perna curta</div>
+            </div>
+            <ol style="margin-left: 20px; margin-top: 15px;">
+                <li>Uma perna na linha 10, coluna A (mesma linha do LED+)</li>
+                <li>Outra perna na linha + (positivo da borda)</li>
+            </ol>
+            <div class="dica">
+                <strong>💡 Por que mesma linha?</strong><br>
+                Na protoboard, furos da mesma linha estão conectados internamente!<br>
+                Então resistor e LED+ ficam conectados automaticamente.
+            </div>
+            <h3 style="margin-top: 30px;">📸 Checkpoint</h3>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">Resistor firmemente inserido</li>
+                <li onclick="marcarCompleto(this)">Uma perna na linha 10, coluna A</li>
+                <li onclick="marcarCompleto(this)">Outra perna na linha + (borda)</li>
+                <li onclick="marcarCompleto(this)">Resistor fazendo "ponte"</li>
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(5)">✅ Resistor Conectado → Próximo</button>
+        </div>
+    </div>
+
+    <!-- PASSO 5 -->
+    <div class="passo oculto" id="passo5">
+        <div class="passo-numero">5</div>
+        <h2>Montar o Circuito - Parte 3: Jumpers</h2>
+        <div class="passo-conteudo">
+            <h3>🔧 Conectar ao Arduino:</h3>
+            <h4>5.1 - Jumper Vermelho (Positivo)</h4>
+            <ol style="margin-left: 20px;">
+                <li>Pegar jumper vermelho</li>
+                <li>Conectar uma ponta no Arduino pino <strong>13</strong></li>
+                <li>Conectar outra ponta na linha <strong>+</strong> da protoboard</li>
+            </ol>
+            <div class="screenshot">
+                <div class="screenshot-texto">Arduino                 Protoboard
+┌──────────┐           ┌──────────┐
+│   13 ●───┼─────🔴────┼→ + ●     │
+│          │           │          │</div>
+            </div>
+            <h4>5.2 - Jumper Preto (Negativo/GND)</h4>
+            <ol style="margin-left: 20px;">
+                <li>Pegar jumper preto</li>
+                <li>Conectar uma ponta no Arduino <strong>GND</strong></li>
+                <li>Conectar outra ponta na linha <strong>11, coluna A</strong> (LED-)</li>
+            </ol>
+            <div class="screenshot">
+                <div class="screenshot-texto">Arduino                 Protoboard
+┌──────────┐           ┌──────────┐
+│          │           │  10 ●─┐  │
+│          │           │      [LED]
+│  GND ●───┼─────⚫────┼→ 11 ●─┘  │
+└──────────┘           └──────────┘</div>
+            </div>
+            <div class="dica">
+                <strong>💡 Cores dos Jumpers:</strong><br>
+                Vermelho = Positivo (+) / Alimentação<br>
+                Preto = Negativo (-) / GND (terra)<br>
+                Não é obrigatório, mas ajuda MUITO a organizar!
+            </div>
+            <h3 style="margin-top: 30px;">🎉 Circuito Completo!</h3>
+            <div class="screenshot">
+                <p><strong>Diagrama Final:</strong></p>
+                <div class="screenshot-texto">Arduino Uno               Protoboard
+┌──────────┐           ┌──────────────┐
+│   13 ●───┼───🔴──────┼→ + ●─┐       │
+│          │           │      │       │
+│          │           │    [R220Ω]   │
+│          │           │      │       │
+│          │           │  10 ●─┤      │
+│          │           │      [LED]   │
+│          │           │  11 ●─┘      │
+│  GND ●───┼───⚫──────┼→     ●       │
+└──────────┘           └──────────────┘</div>
+            </div>
+            <h3>✅ Checklist Final do Circuito</h3>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">Jumper vermelho: Pino 13 → Linha +</li>
+                <li onclick="marcarCompleto(this)">Resistor: Linha + → Linha 10 coluna A</li>
+                <li onclick="marcarCompleto(this)">LED perna longa: Linha 10 coluna E</li>
+                <li onclick="marcarCompleto(this)">LED perna curta: Linha 11 coluna E</li>
+                <li onclick="marcarCompleto(this)">Jumper preto: GND → Linha 11 coluna A</li>
+                <li onclick="marcarCompleto(this)">Nenhum fio solto ou tocando outro</li>
+            </div>
+            <div class="erro">
+                <strong>🛑 ANTES DE CONTINUAR:</strong><br>
+                Verifique CADA conexão novamente!<br>
+                Um erro agora pode queimar seu LED!
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(6)">✅ Circuito Verificado → Programar Arduino</button>
+        </div>
+    </div>
+
+    <!-- PASSO 6 -->
+    <div class="passo oculto" id="passo6">
+        <div class="passo-numero">6</div>
+        <h2>Conectar Arduino ao Computador</h2>
+        <div class="passo-conteudo">
+            <h3>🔌 Primeira Conexão:</h3>
+            <ol style="margin-left: 20px; margin-top: 15px;">
+                <li>Pegar cabo USB A-B</li>
+                <li>Conectar lado QUADRADO (USB-B) no Arduino</li>
+                <li>Conectar lado RETANGULAR (USB-A) no computador</li>
+                <li>Aguardar alguns segundos...</li>
+            </ol>
+            <div class="screenshot">
+                <div class="screenshot-texto">Computador          Cabo USB          Arduino
+┌────────┐      ┌─────────────┐      ┌──────┐
+│   USB  │◄─────┤ USB-A | USB-B├─────►│ USB │
+└────────┘      └─────────────┘      └──────┘</div>
+            </div>
+            <h3 style="margin-top: 30px;">✅ Sinais de Sucesso:</h3>
+            <ul style="margin-left: 20px;">
+                <li><strong>LED "ON" do Arduino acende</strong> (LED laranja pequeno na placa)</li>
+                <li><strong>Windows faz som</strong> "dispositivo conectado"</li>
+                <li><strong>Luzes RX/TX piscam</strong> brevemente</li>
+            </ul>
+            <div class="alerta">
+                <strong>⚠️ Não aconteceu nada?</strong><br>
+                • Tente outra porta USB do computador<br>
+                • Verifique se cabo USB é de DADOS (não só carga)<br>
+                • Cabo de celular pode ser só carregamento!
+            </div>
+            <div class="dica">
+                <strong>💡 LED "ON" não acende?</strong><br>
+                Arduino pode estar queimado OU cabo não é de dados.<br>
+                Teste com outro Arduino ou cabo primeiro!
+            </div>
+            <h3 style="margin-top: 30px;">📸 Checkpoint</h3>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">Cabo USB conectado firmemente</li>
+                <li onclick="marcarCompleto(this)">LED "ON" do Arduino aceso</li>
+                <li onclick="marcarCompleto(this)">Computador reconheceu (som no Windows)</li>
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(7)">✅ Arduino Conectado → Próximo</button>
+        </div>
+    </div>
+
+    <!-- PASSO 7 -->
+    <div class="passo oculto" id="passo7">
+        <div class="passo-numero">7</div>
+        <h2>Abrir Arduino IDE</h2>
+        <div class="passo-conteudo">
+            <h3>💻 Iniciando o Arduino IDE:</h3>
+            <ol style="margin-left: 20px; margin-top: 15px;">
+                <li>Abra o Arduino IDE no computador</li>
+                <li>Se não tiver instalado, baixe em: <a href="https://www.arduino.cc/en/software" target="_blank">arduino.cc/en/software</a></li>
+                <li>Aguarde carregar completamente</li>
+            </ol>
+            <div class="screenshot">
+                <p><strong>Tela inicial do Arduino IDE:</strong></p>
+                <div class="screenshot-texto">┌─────────────────────────────────────────────┐
+│  Arduino IDE 2.x                            │
+├─────────────────────────────────────────────┤
+│  Arquivo  Editar  Sketch  Ferramentas  Ajuda│
+├─────────────────────────────────────────────┤
+│  [▶ Verificar] [→ Carregar]                 │
+├─────────────────────────────────────────────┤
+│                                             │
+│  void setup() {                             │
+│    // coloque seu setup aqui               │
+│  }                                          │
+│                                             │
+│  void loop() {                              │
+│    // coloque seu código aqui              │
+│  }                                          │
+└─────────────────────────────────────────────┘</div>
+            </div>
+
+            <h3 style="margin-top: 25px;">🔧 Configurar a Placa:</h3>
+            <ol style="margin-left: 20px; margin-top: 10px;">
+                <li>Clique em <strong>Ferramentas</strong> no menu superior</li>
+                <li>Passe o mouse em <strong>Placa</strong></li>
+                <li>Selecione <strong>"Arduino AVR Boards"</strong></li>
+                <li>Selecione <strong>"Arduino Uno"</strong></li>
+            </ol>
+            <div class="screenshot">
+                <div class="screenshot-texto">Ferramentas
+  └─ Placa: "Arduino Uno"
+       └─ Arduino AVR Boards
+            └─ ✅ Arduino Uno   ← Selecionar este!</div>
+            </div>
+
+            <h3 style="margin-top: 25px;">🔌 Configurar a Porta:</h3>
+            <ol style="margin-left: 20px; margin-top: 10px;">
+                <li>Clique em <strong>Ferramentas → Porta</strong></li>
+                <li>Selecione a porta COM com "(Arduino Uno)"</li>
+                <li>Geralmente é <strong>COM3</strong> ou <strong>COM4</strong> no Windows</li>
+                <li>No Linux/Mac: <strong>/dev/ttyUSB0</strong> ou <strong>/dev/cu.usbmodem...</strong></li>
+            </ol>
+            <div class="alerta">
+                <strong>⚠️ Não aparece nenhuma porta COM?</strong><br>
+                • Verifique se o Arduino está conectado<br>
+                • Instale o driver CH340 se necessário<br>
+                • Tente desconectar e reconectar o USB
+            </div>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">Arduino IDE aberto</li>
+                <li onclick="marcarCompleto(this)">Placa configurada como "Arduino Uno"</li>
+                <li onclick="marcarCompleto(this)">Porta COM selecionada</li>
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(8)">✅ IDE Configurada → Escrever Código</button>
+        </div>
+    </div>
+
+    <!-- PASSO 8 -->
+    <div class="passo oculto" id="passo8">
+        <div class="passo-numero">8</div>
+        <h2>Escrever o Código - Parte 1: Setup</h2>
+        <div class="passo-conteudo">
+            <h3>📝 Entendendo a Estrutura do Arduino:</h3>
+            <p style="margin: 15px 0;">Todo programa Arduino tem 2 funções principais:</p>
+            <div class="screenshot">
+                <div class="screenshot-texto">┌─────────────────────────────┐
+│  setup()                    │
+│  Roda UMA VEZ ao iniciar    │
+│  → Configura pinos, serial  │
+├─────────────────────────────┤
+│  loop()                     │
+│  Roda INFINITAMENTE         │
+│  → Lógica principal aqui    │
+└─────────────────────────────┘</div>
+            </div>
+
+            <h3 style="margin-top: 25px;">✏️ Apagar o código atual e digitar:</h3>
+            <div class="codigo-titulo">📄 led_controller.ino — Parte 1: Definições e Setup</div>
+            <div class="codigo">
+                <button class="btn-copiar" onclick="copiarCodigo(this)">📋 Copiar</button>
+<span class="linha-comentario">// ===================================================
+// ISW044 - Aula 01: LED Controller
+// Pisca um LED no pino 13
+// ===================================================</span>
+
+<span class="linha-comentario">// Definição da constante do pino</span>
+<span class="linha-keyword">const</span> <span class="linha-codigo">int</span> <span class="linha-codigo">LED_PIN</span> = <span class="linha-numero">13</span>;  <span class="linha-comentario">// Pino onde o LED está conectado</span>
+
+<span class="linha-comentario">// ===================================================
+// SETUP: Roda uma vez ao ligar o Arduino
+// ===================================================</span>
+<span class="linha-funcao">void</span> <span class="linha-funcao">setup</span>() {
+  <span class="linha-comentario">// Configura o pino 13 como SAÍDA (OUTPUT)</span>
+  <span class="linha-funcao">pinMode</span>(LED_PIN, OUTPUT);
+  
+  <span class="linha-comentario">// Inicia a comunicação serial (para debug)</span>
+  <span class="linha-funcao">Serial</span>.<span class="linha-funcao">begin</span>(<span class="linha-numero">9600</span>);
+  <span class="linha-funcao">Serial</span>.<span class="linha-funcao">println</span>(<span class="linha-codigo">"LED Controller iniciado!"</span>);
+}
+            </div>
+            <div class="dica">
+                <strong>💡 O que cada linha faz?</strong><br>
+                <code>const int LED_PIN = 13;</code> → Cria uma constante chamada LED_PIN com valor 13<br>
+                <code>pinMode(LED_PIN, OUTPUT);</code> → Diz ao Arduino que o pino 13 vai ENVIAR sinal<br>
+                <code>Serial.begin(9600);</code> → Abre canal de comunicação com o computador
+            </div>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">Código apagado (tela limpa)</li>
+                <li onclick="marcarCompleto(this)">Variável LED_PIN declarada</li>
+                <li onclick="marcarCompleto(this)">Função setup() digitada corretamente</li>
+                <li onclick="marcarCompleto(this)">pinMode() configurado como OUTPUT</li>
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(9)">✅ Setup Digitado → Próximo</button>
+        </div>
+    </div>
+
+    <!-- PASSO 9 -->
+    <div class="passo oculto" id="passo9">
+        <div class="passo-numero">9</div>
+        <h2>Escrever o Código - Parte 2: Loop</h2>
+        <div class="passo-conteudo">
+            <h3>📝 Adicionar a função loop():</h3>
+            <p style="margin: 15px 0;">Logo abaixo do setup(), adicione o loop:</p>
+            <div class="codigo-titulo">📄 led_controller.ino — Parte 2: Loop Principal</div>
+            <div class="codigo">
+                <button class="btn-copiar" onclick="copiarCodigo(this)">📋 Copiar</button>
+<span class="linha-comentario">// ===================================================
+// LOOP: Roda infinitamente
+// ===================================================</span>
+<span class="linha-funcao">void</span> <span class="linha-funcao">loop</span>() {
+  <span class="linha-comentario">// LIGAR o LED</span>
+  <span class="linha-funcao">digitalWrite</span>(LED_PIN, HIGH);   <span class="linha-comentario">// HIGH = 5V = LED aceso</span>
+  <span class="linha-funcao">Serial</span>.<span class="linha-funcao">println</span>(<span class="linha-codigo">"LED: LIGADO"</span>);
+  <span class="linha-funcao">delay</span>(<span class="linha-numero">1000</span>);                   <span class="linha-comentario">// Espera 1 segundo (1000ms)</span>
+
+  <span class="linha-comentario">// DESLIGAR o LED</span>
+  <span class="linha-funcao">digitalWrite</span>(LED_PIN, LOW);    <span class="linha-comentario">// LOW = 0V = LED apagado</span>
+  <span class="linha-funcao">Serial</span>.<span class="linha-funcao">println</span>(<span class="linha-codigo">"LED: DESLIGADO"</span>);
+  <span class="linha-funcao">delay</span>(<span class="linha-numero">1000</span>);                   <span class="linha-comentario">// Espera 1 segundo</span>
+}
+            </div>
+            <div class="dica">
+                <strong>💡 O que cada linha faz?</strong><br>
+                <code>digitalWrite(LED_PIN, HIGH)</code> → Coloca 5V no pino → LED acende<br>
+                <code>digitalWrite(LED_PIN, LOW)</code> → Coloca 0V no pino → LED apaga<br>
+                <code>delay(1000)</code> → Pausa de 1000 milissegundos = 1 segundo
+            </div>
+            <h3 style="margin-top: 25px;">📄 Código Completo (para conferir):</h3>
+            <div class="codigo-titulo">📄 led_controller.ino — Código Completo</div>
+            <div class="codigo">
+                <button class="btn-copiar" onclick="copiarCodigo(this)">📋 Copiar</button>
+<span class="linha-comentario">// ISW044 - Aula 01: LED Controller</span>
+<span class="linha-keyword">const</span> <span class="linha-codigo">int</span> LED_PIN = <span class="linha-numero">13</span>;
+
+<span class="linha-funcao">void</span> <span class="linha-funcao">setup</span>() {
+  <span class="linha-funcao">pinMode</span>(LED_PIN, OUTPUT);
+  <span class="linha-funcao">Serial</span>.<span class="linha-funcao">begin</span>(<span class="linha-numero">9600</span>);
+  <span class="linha-funcao">Serial</span>.<span class="linha-funcao">println</span>(<span class="linha-codigo">"LED Controller iniciado!"</span>);
+}
+
+<span class="linha-funcao">void</span> <span class="linha-funcao">loop</span>() {
+  <span class="linha-funcao">digitalWrite</span>(LED_PIN, HIGH);
+  <span class="linha-funcao">Serial</span>.<span class="linha-funcao">println</span>(<span class="linha-codigo">"LED: LIGADO"</span>);
+  <span class="linha-funcao">delay</span>(<span class="linha-numero">1000</span>);
+
+  <span class="linha-funcao">digitalWrite</span>(LED_PIN, LOW);
+  <span class="linha-funcao">Serial</span>.<span class="linha-funcao">println</span>(<span class="linha-codigo">"LED: DESLIGADO"</span>);
+  <span class="linha-funcao">delay</span>(<span class="linha-numero">1000</span>);
+}
+            </div>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">Função loop() adicionada</li>
+                <li onclick="marcarCompleto(this)">digitalWrite(HIGH) para ligar</li>
+                <li onclick="marcarCompleto(this)">digitalWrite(LOW) para desligar</li>
+                <li onclick="marcarCompleto(this)">delay(1000) nos dois estados</li>
+                <li onclick="marcarCompleto(this)">Código completo conferido</li>
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(10)">✅ Código Digitado → Verificar</button>
+        </div>
+    </div>
+
+    <!-- PASSO 10 -->
+    <div class="passo oculto" id="passo10">
+        <div class="passo-numero">10</div>
+        <h2>Verificar o Código (Compilar)</h2>
+        <div class="passo-conteudo">
+            <h3>🔍 Antes de enviar, vamos verificar erros:</h3>
+            <ol style="margin-left: 20px; margin-top: 15px;">
+                <li>Clique no botão <strong>✓ (Verificar)</strong> — ícone de visto na barra superior</li>
+                <li>Ou pressione <strong>Ctrl + R</strong></li>
+                <li>Aguarde a mensagem na parte inferior da tela</li>
+            </ol>
+            <div class="screenshot">
+                <p><strong>Mensagem de sucesso esperada:</strong></p>
+                <div class="screenshot-texto">Compilando sketch...
+
+Sketch usa 924 bytes (2%) de espaço de armazenamento de programa.
+As variáveis globais usam 9 bytes (0%) de memória dinâmica.
+
+✅ Compilação bem-sucedida.</div>
+            </div>
+            <div class="erro">
+                <strong>🛑 Apareceu erro vermelho?</strong><br>
+                Erros comuns e soluções:<br><br>
+                ❌ <code>'LED_PIN' was not declared</code> → Verifique se declarou <code>const int LED_PIN = 13;</code><br>
+                ❌ <code>expected ';'</code> → Faltou ponto e vírgula no final de alguma linha<br>
+                ❌ <code>expected '}'</code> → Alguma chave { ou } faltando<br><br>
+                <strong>Dica:</strong> O erro mostra a linha com problema. Clique nele para ir direto!
+            </div>
+            <div class="dica">
+                <strong>💡 O que é compilação?</strong><br>
+                O IDE transforma seu código C++ em linguagem de máquina<br>
+                que o microcontrolador do Arduino entende!
+            </div>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">Cliquei em Verificar (Ctrl+R)</li>
+                <li onclick="marcarCompleto(this)">Apareceu "Compilação bem-sucedida"</li>
+                <li onclick="marcarCompleto(this)">Nenhum erro em vermelho</li>
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(11)">✅ Código Verificado → Carregar no Arduino</button>
+        </div>
+    </div>
+
+    <!-- PASSO 11 -->
+    <div class="passo oculto" id="passo11">
+        <div class="passo-numero">11</div>
+        <h2>Carregar o Código no Arduino</h2>
+        <div class="passo-conteudo">
+            <h3>🚀 Enviando para o Arduino (Upload):</h3>
+            <ol style="margin-left: 20px; margin-top: 15px;">
+                <li>Certifique-se que o Arduino está conectado</li>
+                <li>Clique no botão <strong>→ (Carregar/Upload)</strong></li>
+                <li>Ou pressione <strong>Ctrl + U</strong></li>
+                <li>Observe as luzes RX/TX piscando no Arduino</li>
+                <li>Aguarde a mensagem de conclusão</li>
+            </ol>
+            <div class="screenshot">
+                <p><strong>O que acontece durante o upload:</strong></p>
+                <div class="screenshot-texto">1. IDE compila o código novamente
+2. Envia via USB para o Arduino
+3. Luzes TX/RX piscam rapidamente
+4. Arduino reinicia automaticamente
+5. Seu programa começa a rodar!
+
+Mensagem esperada:
+✅ Carregamento concluído.</div>
+            </div>
+            <div class="alerta">
+                <strong>⚠️ Erro "Port not found" ou "avrdude: error"?</strong><br>
+                • Verifique se a porta COM correta está selecionada<br>
+                • Tente desconectar e reconectar o Arduino<br>
+                • Feche o Monitor Serial antes de fazer upload
+            </div>
+            <div class="dica">
+                <strong>💡 As luzes TX/RX piscando</strong> significam que dados estão<br>
+                sendo transferidos entre o computador e o Arduino. Normal!
+            </div>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">Cliquei em Carregar (Ctrl+U)</li>
+                <li onclick="marcarCompleto(this)">Luzes RX/TX piscaram durante upload</li>
+                <li onclick="marcarCompleto(this)">Apareceu "Carregamento concluído"</li>
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(12)">✅ Código Carregado → Ver Resultado!</button>
+        </div>
+    </div>
+
+    <!-- PASSO 12 -->
+    <div class="passo oculto" id="passo12">
+        <div class="passo-numero">12</div>
+        <h2>Testar o Resultado 🎉</h2>
+        <div class="passo-conteudo">
+            <h3>🔦 Observar o LED:</h3>
+            <p style="margin: 15px 0;">Após o upload, o Arduino reinicia e começa a executar o programa automaticamente!</p>
+            <div class="screenshot">
+                <p><strong>O que você deve ver:</strong></p>
+                <div class="screenshot-texto">⏱️ Segundo 0: LED ACENDE  💡
+⏱️ Segundo 1: LED APAGA   ⚫
+⏱️ Segundo 2: LED ACENDE  💡
+⏱️ Segundo 3: LED APAGA   ⚫
+⏱️ Segundo 4: LED ACENDE  💡
+...repetindo infinitamente...</div>
+            </div>
+            <div class="sucesso">
+                <strong>🎉 PARABÉNS! Se o LED está piscando, FUNCIONOU!</strong><br>
+                Você acabou de programar um microcontrolador pela primeira vez!
+            </div>
+            <div class="alerta">
+                <strong>⚠️ LED não piscou?</strong><br>
+                Problemas comuns:<br>
+                • LED invertido → Retire e coloque do jeito correto<br>
+                • Resistor no lugar errado → Confira o diagrama<br>
+                • Upload não concluiu → Repita o passo 11<br>
+                • Jumpers trocados → Verifique pino 13 e GND
+            </div>
+            <div class="dica">
+                <strong>💡 Curiosidade:</strong> O Arduino Uno tem um LED embutido no pino 13!<br>
+                Mesmo sem o LED externo, você verá um LED laranja piscar na placa.
+            </div>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">LED externo piscando a cada 1 segundo</li>
+                <li onclick="marcarCompleto(this)">LED da placa também piscando junto</li>
+                <li onclick="marcarCompleto(this)">Ciclo ligado/desligado consistente</li>
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(13)">✅ LED Piscando → Monitor Serial</button>
+        </div>
+    </div>
+
+    <!-- PASSO 13 -->
+    <div class="passo oculto" id="passo13">
+        <div class="passo-numero">13</div>
+        <h2>Usar o Monitor Serial</h2>
+        <div class="passo-conteudo">
+            <h3>📺 Comunicação Arduino ↔ Computador:</h3>
+            <ol style="margin-left: 20px; margin-top: 15px;">
+                <li>No Arduino IDE, clique em <strong>Ferramentas → Monitor Serial</strong></li>
+                <li>Ou pressione <strong>Ctrl + Shift + M</strong></li>
+                <li>Configure a velocidade para <strong>9600 baud</strong> (canto inferior direito)</li>
+                <li>Observe as mensagens chegando!</li>
+            </ol>
+            <div class="screenshot">
+                <p><strong>Monitor Serial esperado:</strong></p>
+                <div class="screenshot-texto">┌─────────────────────────────────┐
+│  Monitor Serial                 │
+├─────────────────────────────────┤
+│  LED Controller iniciado!       │
+│  LED: LIGADO                    │
+│  LED: DESLIGADO                 │
+│  LED: LIGADO                    │
+│  LED: DESLIGADO                 │
+│  ...                            │
+├─────────────────────────────────┤
+│  [Enviar mensagem...]  9600 baud│
+└─────────────────────────────────┘</div>
+            </div>
+            <div class="dica">
+                <strong>💡 Para que serve o Monitor Serial?</strong><br>
+                É como um "console" para depurar seu programa!<br>
+                Você pode ver variáveis, estados e enviar comandos ao Arduino em tempo real.
+            </div>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">Monitor Serial aberto</li>
+                <li onclick="marcarCompleto(this)">Velocidade em 9600 baud</li>
+                <li onclick="marcarCompleto(this)">Mensagens "LED: LIGADO/DESLIGADO" aparecendo</li>
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(14)">✅ Monitor Serial Funcionando → Desafio!</button>
+        </div>
+    </div>
+
+    <!-- PASSO 14 -->
+    <div class="passo oculto" id="passo14">
+        <div class="passo-numero">14</div>
+        <h2>Desafio: Modificar o Código</h2>
+        <div class="passo-conteudo">
+            <h3>🏆 Hora de Experimentar!</h3>
+            <p style="margin: 15px 0;">Agora que o básico funciona, tente esses desafios:</p>
+
+            <h4>🔴 Desafio 1 — Mudar a velocidade:</h4>
+            <p>Altere o delay para 500ms e veja o LED piscar mais rápido!</p>
+            <div class="codigo">
+                <button class="btn-copiar" onclick="copiarCodigo(this)">📋 Copiar</button>
+<span class="linha-funcao">delay</span>(<span class="linha-numero">500</span>);   <span class="linha-comentario">// Antes era 1000 (1 segundo) — agora 0,5 segundo</span>
+            </div>
+
+            <h4 style="margin-top: 20px;">🟡 Desafio 2 — LED mais tempo ligado:</h4>
+            <p>Deixe o LED aceso por 2 segundos e apagado por 0,5 segundo:</p>
+            <div class="codigo">
+                <button class="btn-copiar" onclick="copiarCodigo(this)">📋 Copiar</button>
+<span class="linha-funcao">digitalWrite</span>(LED_PIN, HIGH);
+<span class="linha-funcao">delay</span>(<span class="linha-numero">2000</span>);   <span class="linha-comentario">// 2 segundos ligado</span>
+
+<span class="linha-funcao">digitalWrite</span>(LED_PIN, LOW);
+<span class="linha-funcao">delay</span>(<span class="linha-numero">500</span>);    <span class="linha-comentario">// 0,5 segundo apagado</span>
+            </div>
+
+            <h4 style="margin-top: 20px;">🟢 Desafio 3 — Código Morse SOS:</h4>
+            <p>Faça o LED piscar o sinal SOS (... --- ...):</p>
+            <div class="codigo">
+                <button class="btn-copiar" onclick="copiarCodigo(this)">📋 Copiar</button>
+<span class="linha-comentario">// Função auxiliar para piscar</span>
+<span class="linha-funcao">void</span> <span class="linha-funcao">piscar</span>(<span class="linha-codigo">int</span> duracao) {
+  <span class="linha-funcao">digitalWrite</span>(LED_PIN, HIGH);
+  <span class="linha-funcao">delay</span>(duracao);
+  <span class="linha-funcao">digitalWrite</span>(LED_PIN, LOW);
+  <span class="linha-funcao">delay</span>(<span class="linha-numero">200</span>);
+}
+
+<span class="linha-funcao">void</span> <span class="linha-funcao">loop</span>() {
+  <span class="linha-comentario">// S = 3 pontos curtos</span>
+  piscar(<span class="linha-numero">200</span>); piscar(<span class="linha-numero">200</span>); piscar(<span class="linha-numero">200</span>);
+  <span class="linha-funcao">delay</span>(<span class="linha-numero">400</span>);
+  
+  <span class="linha-comentario">// O = 3 traços longos</span>
+  piscar(<span class="linha-numero">600</span>); piscar(<span class="linha-numero">600</span>); piscar(<span class="linha-numero">600</span>);
+  <span class="linha-funcao">delay</span>(<span class="linha-numero">400</span>);
+  
+  <span class="linha-comentario">// S = 3 pontos curtos</span>
+  piscar(<span class="linha-numero">200</span>); piscar(<span class="linha-numero">200</span>); piscar(<span class="linha-numero">200</span>);
+  <span class="linha-funcao">delay</span>(<span class="linha-numero">2000</span>); <span class="linha-comentario">// Pausa entre repetições</span>
+}
+            </div>
+            <div class="dica">
+                <strong>💡 Lembre-se:</strong> Após modificar o código, sempre:<br>
+                1. Verificar (Ctrl+R)<br>
+                2. Carregar (Ctrl+U)<br>
+                3. Observar o resultado!
+            </div>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">Tentei pelo menos um desafio</li>
+                <li onclick="marcarCompleto(this)">Modifiquei o delay e testei</li>
+                <li onclick="marcarCompleto(this)">Entendi como o delay controla a velocidade</li>
+            </div>
+            <button class="btn-proximo" onclick="proximoPasso(15)">✅ Desafios Concluídos → Finalizar Aula</button>
+        </div>
+    </div>
+
+    <!-- PASSO 15 -->
+    <div class="passo oculto" id="passo15">
+        <div class="passo-numero">15</div>
+        <h2>🎓 Conclusão da Aula 01</h2>
+        <div class="passo-conteudo">
+            <div class="final-card">
+                <h2>🏆 Parabéns! Você Concluiu a Aula 01!</h2>
+                <p style="font-size: 1.2em; margin-top: 15px;">Você programou um Arduino pela primeira vez!</p>
+            </div>
+
+            <h3 style="margin-top: 30px;">📚 O que você aprendeu hoje:</h3>
+            <div class="checklist">
+                <li onclick="marcarCompleto(this)">Identificar componentes eletrônicos: Arduino, LED, Resistor, Protoboard</li>
+                <li onclick="marcarCompleto(this)">Montar um circuito simples na protoboard</li>
+                <li onclick="marcarCompleto(this)">Entender polaridade do LED (perna longa = +)</li>
+                <li onclick="marcarCompleto(this)">Configurar o Arduino IDE (placa + porta)</li>
+                <li onclick="marcarCompleto(this)">Escrever um programa com setup() e loop()</li>
+                <li onclick="marcarCompleto(this)">Usar pinMode(), digitalWrite() e delay()</li>
+                <li onclick="marcarCompleto(this)">Usar o Monitor Serial para debug</li>
+                <li onclick="marcarCompleto(this)">Verificar e carregar código no Arduino</li>
+            </div>
+
+            <h3 style="margin-top: 30px;">🔑 Conceitos-chave para lembrar:</h3>
+            <div class="screenshot">
+                <div class="screenshot-texto">pinMode(pino, OUTPUT)   → Configura pino como saída
+pinMode(pino, INPUT)    → Configura pino como entrada
+
+digitalWrite(pino, HIGH) → 5V no pino (liga)
+digitalWrite(pino, LOW)  → 0V no pino (desliga)
+
+delay(milissegundos)    → Pausa o programa
+1000ms = 1 segundo
+
+Serial.begin(9600)      → Inicia comunicação serial
+Serial.println("texto") → Envia mensagem ao computador</div>
+            </div>
+
+            <h3 style="margin-top: 30px;">📁 Estrutura do Projeto:</h3>
+            <div class="screenshot">
+                <div class="screenshot-texto">aula_01_led_controller/
+├── led_controller.ino     ← Código principal
+├── diagrama_circuito.txt  ← Diagrama do circuito
+└── README.md              ← Documentação do projeto</div>
+            </div>
+
+            <h3 style="margin-top: 30px;">🚀 Próxima Aula:</h3>
+            <div class="dica">
+                <strong>Aula 02: Botão + LED</strong><br>
+                Vamos aprender a ler ENTRADAS digitais com um botão!<br>
+                O LED só vai acender quando o botão for pressionado.<br><br>
+                Novos conceitos: <code>digitalRead()</code>, <code>if/else</code>, resistor pull-up/pull-down
+            </div>
+
+            <div class="sucesso" style="margin-top: 20px;">
+                <strong>💾 Salve seu projeto!</strong><br>
+                Arquivo → Salvar Como → "aula_01_led_controller"<br>
+                Crie uma pasta para cada aula e mantenha tudo organizado!
+            </div>
+
+            <div style="background:#f0f0f0; border-radius: 10px; padding: 20px; margin-top: 20px; text-align: center;">
+                <p style="font-size: 1.1em;"><strong>ISW044 – Sistemas Embarcados</strong></p>
+                <p>Aula 01 concluída ✅ | Aula 02 aguardando você!</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let totalPassos = 15;
+    let passoAtual = 1;
+    let completados = 0;
+    let passosCompletos = [];
+
+    function init() {
+        const nav = document.getElementById('nav-passos');
+        for (let i = 1; i <= totalPassos; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'nav-btn' + (i === 1 ? ' ativo' : '');
+            btn.id = 'nav' + i;
+            btn.textContent = i;
+            btn.title = 'Ir para passo ' + i;
+            btn.onclick = () => irParaPasso(i);
+            nav.appendChild(btn);
+        }
+    }
+
+    function marcarCompleto(elemento) {
+        elemento.classList.toggle('completo');
+        atualizarProgresso();
+    }
+
+    function proximoPasso(numero) {
+        document.getElementById('passo' + passoAtual).classList.add('oculto');
+        document.getElementById('nav' + passoAtual).classList.remove('ativo');
+        document.getElementById('nav' + passoAtual).classList.add('feito');
+
+        document.getElementById('passo' + numero).classList.remove('oculto');
+        document.getElementById('nav' + numero).classList.add('ativo');
+
+        passoAtual = numero;
+        if (!passosCompletos.includes(numero - 1)) {
+            passosCompletos.push(numero - 1);
+            completados = passosCompletos.length;
+        }
+        atualizarProgresso();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function irParaPasso(numero) {
+        document.getElementById('passo' + passoAtual).classList.add('oculto');
+        document.getElementById('nav' + passoAtual).classList.remove('ativo');
+
+        document.getElementById('passo' + numero).classList.remove('oculto');
+        document.getElementById('nav' + numero).classList.add('ativo');
+
+        passoAtual = numero;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function atualizarProgresso() {
+        let percentual = Math.round((completados / totalPassos) * 100);
+        document.getElementById('progresso').style.width = percentual + '%';
+        document.getElementById('progresso').textContent = percentual + '%';
+        document.getElementById('progresso-texto').textContent =
+            `Você completou ${completados} de ${totalPassos} etapas`;
+    }
+
+    function copiarCodigo(btn) {
+        const bloco = btn.parentElement;
+        const texto = bloco.innerText.replace('📋 Copiar', '').trim();
+        navigator.clipboard.writeText(texto).then(() => {
+            btn.textContent = '✅ Copiado!';
+            setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000);
+        });
+    }
+
+    init();
+</script>
+</body>
+</html>
